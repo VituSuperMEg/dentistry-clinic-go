@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb-dentistry-clinic
+    environment:
+      MONGO_INITDB_DATABASE: dentistry_clinic
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - mongodb-network
+    restart: always
+
+networks:
+  mongodb-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local
