@@ -25,3 +25,7 @@ func (s *PacienteService) RegistrarPaciente(ctx context.Context, nome, cpf, tele
 func (s *PacienteService) ListarPacientes(ctx context.Context) ([]paciente.Paciente, error) {
 	return s.repo.BuscarTodos(ctx)
 }
+
+func (s *PacienteService) Delete(ctx context.Context, id string) error {
+	return s.repo.Delete(ctx, id)
+}

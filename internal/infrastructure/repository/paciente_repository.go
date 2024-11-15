@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"dentistry-clinic/internal/domain/paciente"
+	"fmt"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -51,4 +52,21 @@ func (r *PacienteRepository) BuscarTodos(ctx context.Context) ([]paciente.Pacien
 	}
 
 	return pacientes, nil
+}
+func (r *PacienteRepository) Delete(ctx context.Context, id string) error {
+	objID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return err
+	}
+
+	result, err := r.colletion.DeleteOne(ctx, bson.M{"_id": objID})
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return fmt.Errorf("no document found with id: %s", id)
+	}
+
+	return nil
 }

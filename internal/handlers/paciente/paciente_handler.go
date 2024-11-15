@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"dentistry-clinic/internal/application"
+	"dentistry-clinic/internal/domain/paciente"
 	"dentistry-clinic/internal/infrastructure/repository"
 	"net/http"
 
@@ -20,32 +21,44 @@ func InitHandlerPaciente(r *gin.Engine, db *mongo.Database) {
 	})
 
 	r.POST("/pacientes", func(c *gin.Context) {
-		nome := c.PostForm("nome")
-		cpf := c.PostForm("cpf")
-		telefone := c.PostForm("telefone")
+		var paciente paciente.Paciente
 
-		_, err := pacienteService.RegistrarPaciente(context.Background(), nome, cpf, telefone)
+		if err := c.BindJSON(&paciente); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+			return
+		}
+
+		_, err := pacienteService.RegistrarPaciente(context.Background(), paciente.Nome, paciente.CPF, paciente.Telefone)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		pacientes, err := pacienteService.ListarPacientes(context.Background())
+		c.JSON(http.StatusOK, gin.H{"message": "Paciente Cadastrado com Sucesso!"})
+	})
+
+	r.DELETE("/pacientes/:id", func(c *gin.Context) {
+		id := c.Param("id")
+		if id == "" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "ID não informado"})
+			return
+		}
+		err := pacienteService.Delete(context.Background(), id)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
-
-		c.HTML(http.StatusOK, "lista_pacientes.html", gin.H{"pacientes": pacientes})
+		c.JSON(http.StatusOK, gin.H{"message": "Paciente excluído com Sucesso"})
 	})
 
 	r.GET("/pacientes/lista", func(c *gin.Context) {
+
 		pacientes, err := pacienteService.ListarPacientes(context.Background())
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.HTML(http.StatusOK, "lista_pacientes.html", gin.H{"pacientes": pacientes})
+		c.JSON(http.StatusOK, gin.H{"pacientes": pacientes})
 	})
 }
