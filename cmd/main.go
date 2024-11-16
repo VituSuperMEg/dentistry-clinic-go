@@ -5,6 +5,7 @@ import (
 	"dentistry-clinic/internal/handlers/auth"
 	"dentistry-clinic/internal/handlers/dentista"
 	handler "dentistry-clinic/internal/handlers/paciente"
+	valorconsulta "dentistry-clinic/internal/handlers/valor_consulta"
 
 	"github.com/gin-contrib/cors"
 
@@ -19,5 +20,6 @@ func main() {
 	auth.InitHanlderAuth(r)
 	handler.InitHandlerPaciente(r, db)
 	dentista.InitHandlerDentista(r, db)
+	valorconsulta.InitHandlerValorConsulta(r, db)
 	r.Run(":1001")
 }
